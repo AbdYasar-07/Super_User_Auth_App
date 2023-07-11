@@ -5,7 +5,17 @@ const Logout = () => {
   const { logout } = useAuth0();
 
   const onLogout = async () => {
-    logout();
+    logout()
+      .then(() => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("auth_access_token");
+      })
+      .catch((error) => {
+        console.error("Error ::", error);
+      })
+      .finally(() => {
+        console.log("removed local storages..");
+      });
   };
 
   return (

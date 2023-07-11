@@ -4,7 +4,7 @@ import AppLayout from "./Components/AppLayout";
 function App() {
   return (
     <div className="App">
-      <AppLayout/>
+      <AppLayout />
     </div>
   );
 }

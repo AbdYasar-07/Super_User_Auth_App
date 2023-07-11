@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Axios from "../Utils/Axios";
 import Pagination from "../Utils/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
+import { FaUser } from "react-icons/fa";
 
 const ContentBody = () => {
   const [data, setData] = useState([]);
@@ -11,13 +12,16 @@ const ContentBody = () => {
   const { getAccessTokenSilently } = useAuth0();
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
 
-  const fetchAccessToken = () => {
-    getAccessTokenSilently()
+  const fetchAccessToken = async () => {
+    await getAccessTokenSilently()
       .then((response) => {
         localStorage.setItem("access_token", response);
       })
       .catch((error) => {
         console.error("Error while fetching token", error);
+      })
+      .finally(() => {
+        console.log("fetched logged user's access token");
       });
   };
 
@@ -49,14 +53,17 @@ const ContentBody = () => {
     return `${diffInDays} days ago`;
   };
 
-  const fetchAuthorizationToken = () => {
+  const fetchAuthorizationToken = async () => {
     const body = {
       grant_type: process.env.REACT_APP_AUTH_GRANT_TYPE,
       client_id: process.env.REACT_APP_M2M_CLIENT_ID,
       client_secret: process.env.REACT_APP_M2M_CLIENT_SECRET,
       audience: process.env.REACT_APP_M2M_AUDIENCE,
     };
-    if (localStorage.getItem("access_token").length > 0) {
+    if (
+      localStorage.getItem("access_token") &&
+      localStorage.getItem("access_token").toString().length > 0
+    ) {
       const authorizationResponse = Axios(
         "https://dev-34chvqyi4i2beker.jp.auth0.com/oauth/token",
         "POST",
@@ -65,20 +72,27 @@ const ContentBody = () => {
       );
       authorizationResponse
         .then((tkn) => {
-          console.log("authz access token", tkn);
           localStorage.setItem("auth_access_token", tkn.access_token);
+          authExtensionApi(
+            "users",
+            "GET",
+            null,
+            localStorage.getItem("auth_access_token")
+          );
         })
-        .catch((error) =>
-          console.error("Error while fetching authorization token ::", error)
-        );
+        .catch((error) => {
+          console.error("Error while fetching authorization token ::", error);
+        })
+        .finally(() => {
+          console.log("got authorization token");
+        });
     }
   };
 
-  const authExtensionApi = (url, method, body, token) => {
+  const authExtensionApi = async (url, method, body, token) => {
     const response = Axios(resource + `/${url}`, method, body, token);
     response
       .then((data) => {
-        console.log("data ::", data);
         setData(data.users);
       })
       .catch((error) => {
@@ -86,20 +100,17 @@ const ContentBody = () => {
           "Error while accessing authorization resource :::",
           error
         );
+      })
+      .finally(() => {
+        console.log("got the user's data");
       });
   };
 
   useEffect(() => {
-    const fetchData = () => {
+    const fetchData = async () => {
       try {
-        fetchAccessToken();
-        fetchAuthorizationToken();
-        authExtensionApi(
-          "users",
-          "GET",
-          null,
-          localStorage.getItem("auth_access_token")
-        );
+        await fetchAccessToken();
+        await fetchAuthorizationToken();
       } catch (error) {
         console.error("error ::", error);
       }
@@ -109,13 +120,14 @@ const ContentBody = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = data && data.slice(indexOfFirstItem, indexOfLastItem);
+  console.log(currentItems);
 
   const handlePageChange = (page) => setCurrentPage(page);
 
   return (
     <div>
-      <div className="container">
+      <div className="container" style={{ height: "499px" }}>
         {" "}
         <hr />
         <table className="table table-striped">
@@ -129,25 +141,36 @@ const ContentBody = () => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((item) => (
-              <tr key={item.user_id}>
-                <td>{item.name}</td>
-                <td>{item.email}</td>
-                <td>{formatTimestamp(item.last_login)}</td>
-                <td>{item.logins_count}</td>
-                <td>{item.identities[0].connection}</td>
-              </tr>
-            ))}
+            {currentItems &&
+              currentItems.map((item) => (
+                <tr key={item.user_id}>
+                  <td>{item.name}</td>
+                  <td>{item.email}</td>
+                  <td>{formatTimestamp(item.last_login)}</td>
+                  <td>{item.logins_count}</td>
+                  <td>{item.identities[0].connection}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
-        <div className="paginator">
+        {!localStorage.getItem("auth_access_token") && (
+          <div>
+            <h6>
+              No user's found <FaUser style={{ marginBottom: "5px" }} />{" "}
+            </h6>
+          </div>
+        )}
+      </div>
+
+      {localStorage.getItem("auth_access_token") && (
+        <div className="paginator container">
           <Pagination
             currentPage={currentPage}
-            totalPages={Math.ceil(data.length / itemsPerPage)}
+            totalPages={Math.ceil(data && data.length / itemsPerPage)}
             onPageChange={handlePageChange}
           />
         </div>
-      </div>
+      )}
     </div>
   );
 };
