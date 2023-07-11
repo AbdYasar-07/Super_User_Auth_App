@@ -1,16 +1,20 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
+import "./Styles/Header.css";
 
 const Header = () => {
   return (
     <header>
       <nav
-        class="navbar navbar-expand-lg navbar-light bg-info"
-        style={{ height: "100px" }}
+        class="navbar navbar-expand-lg navbar-light"
+        style={{ height: "100px", boxShadow: "5px 5px 5px #adadad !important" }}
       >
         <div class="container">
-          <a class="navbar-brand" href="#">
+          <a
+            class="navbar-brand"
+            style={{ position: "absolute", left: "50px" }}
+          >
             <img
               src="https://cdn.auth0.com/styleguide/latest/lib/logos/img/logo-blue.svg"
               alt="auth0"
@@ -34,7 +38,10 @@ const Header = () => {
             id="navbarNav"
           >
             <ul class="navbar-nav">
-              <li class="nav-item dropdown">
+              <li
+                class="nav-item dropdown"
+                style={{ position: "absolute", right: "50px", bottom: "20px" }}
+              >
                 <a
                   class="nav-link dropdown-toggle navbar-brand"
                   href="#"

@@ -1,6 +1,3 @@
-.navColor {
-    background-color: #9f14e5 !important;
-}
-.bg-info{
-    background-color: #9f14e5 !important;
+nav{
+    box-shadow: 5px 5px 5px #adadad50;
 }
