@@ -1,11 +1,16 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import ContentHeader from "./ContentHeader";
 
 const Content = () => {
   return (
     <div>
-      <h1>Content goes here.</h1> 
-      <Outlet/>
+      <ContentHeader
+        title="Users"
+        description="Open a user to add them to a group or assign them to a role"
+      />
+
+      <Outlet />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 #####################################################################################
 
-
 Project Dependencies
 
     1. npm i axios
@@ -8,11 +7,9 @@ Project Dependencies
     3. npm i --save @fortawesome/fontawesome-svg-core
     4. npm i react-router-dom
     5. npm install react-icons
-
-
+    6. npm i @auth0/auth0-react
 
 #####################################################################################
-
 
 # Getting Started with Create React App
 

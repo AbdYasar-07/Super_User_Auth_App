@@ -1,16 +1,18 @@
-import React from 'react'
-import Header from './Header'
-import SidebarComponent from './SidebarComponent'
+import React from "react";
+import Header from "./Header";
+import SidebarComponent from "./SidebarComponent";
 import "../Components/Styles/Layout.css";
-import Content from './Content';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const AppLayout = () => {
+  const { user, isLoading } = useAuth0();
+
   return (
     <div>
-        <Header/>
-        <SidebarComponent/>
+      <Header user={user} />
+      <SidebarComponent />
     </div>
-  )
-}
+  );
+};
 
-export default AppLayout
+export default AppLayout;
