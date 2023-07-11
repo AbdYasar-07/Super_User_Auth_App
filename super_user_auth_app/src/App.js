@@ -1,10 +1,11 @@
 import "./App.css";
 import {FaBeer} from 'react-icons/fa';
+import AppLayout from "./Components/AppLayout";
 
 function App() {
   return (
     <div className="App">
-      <button className="btn btn-primary m-5">Hello App <FaBeer /></button>
+      <AppLayout/>
     </div>
   );
 }
