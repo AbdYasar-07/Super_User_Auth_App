@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import Axios from "../Utils/Axios";
-import Pagination from "../Utils/Pagination";
+import Axios from "../../Utils/Axios";
+import Pagination from "../../Utils/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import { FaUser } from "react-icons/fa";
 

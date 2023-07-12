@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import "./Styles/SidebarComponent.css";
-import Content from "./Content";
+import Content from "./Contents/Content";
 import { FaUserAlt } from "react-icons/fa";
 
 const SidebarComponent = () => {

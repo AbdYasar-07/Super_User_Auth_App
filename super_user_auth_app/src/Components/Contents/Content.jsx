@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import ContentHeader from "./ContentHeader";
-import ContentBody from "./ContentBody";
+import ContentHeader from "../Contents/ContentHeader";
+import ContentBody from "../Contents/ContentBody";
 
 const Content = () => {
   return (
