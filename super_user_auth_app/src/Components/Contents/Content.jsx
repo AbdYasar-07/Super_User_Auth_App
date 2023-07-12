@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import ContentHeader from "../Contents/ContentHeader";
 import ContentBody from "../Contents/ContentBody";
+import ModalDialog from "../UserDetails";
 
 const Content = () => {
   return (
@@ -11,7 +12,8 @@ const Content = () => {
         description="Open a user to add them to a group or assign them to a role"
       />
       <ContentBody />
-      <Outlet />
+      <ModalDialog />
+      {/* <Outlet /> */}
     </div>
   );
 };

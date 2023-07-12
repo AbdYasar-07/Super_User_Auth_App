@@ -2,6 +2,7 @@
 import "./Styles/SidebarComponent.css";
 import Content from "./Contents/Content";
 import { FaUserAlt } from "react-icons/fa";
+import NestedContent from "./Contents/NestedContents";
 
 const SidebarComponent = () => {
   return (
@@ -65,6 +66,7 @@ const SidebarComponent = () => {
           </div>
           <div className="col py-3">
             <Content />
+            <NestedContent/>
           </div>
         </div>
       </div>
