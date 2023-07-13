@@ -1,6 +1,6 @@
 import React from "react";
 import { FaMixer } from "react-icons/fa";
-//"The following table lists all group memberships for the user. This includes both direct memberships and indirect memberships as the result of a mapping or nested groups. Heads up: This list is cached for performance reasons and it could take a few seconds before changes are visible here.",
+//
 export const AllGroupsContent = ({ description }) => {
   return (
     <div className="container mt-4">
@@ -9,7 +9,7 @@ export const AllGroupsContent = ({ description }) => {
   );
 };
 
-export const AllGroupTable = () => {
+export const AllGroupTable = ({ tableRows}) => {
   let tabvalue = "AllGrop";
   let tableRow = ["Name", "Description"];
   let tableColums = [

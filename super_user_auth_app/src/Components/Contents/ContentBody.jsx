@@ -5,12 +5,14 @@ import Pagination from "../../Utils/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import AppSpinner from "../../Utils/AppSpinner";
 
 const ContentBody = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const { getAccessTokenSilently } = useAuth0();
+  const [loadSpinner, setLoadSpinner] = useState(false);
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
 
   const fetchAccessToken = async () => {
@@ -85,7 +87,7 @@ const ContentBody = () => {
           console.error("Error while fetching authorization token ::", error);
         })
         .finally(() => {
-          console.log("got authorization token");
+          setLoadSpinner(false);
         });
     }
   };
@@ -108,6 +110,7 @@ const ContentBody = () => {
   };
 
   useEffect(() => {
+    setLoadSpinner(true);
     const fetchData = async () => {
       try {
         await fetchAccessToken();
@@ -128,45 +131,47 @@ const ContentBody = () => {
 
   return (
     <div>
-      <div className="container" style={{ height: "499px" }}>
-        {" "}
-        <hr />
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Last Login</th>
-              <th>Logins</th>
-              <th>Connection</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems &&
-              currentItems.map((item) => (
-                <tr key={item.user_id}>
-                  <td>
-                    <Link to={`/users/${item.user_id}`}>{item.name}</Link>
-                    {/* <Link to="nestedContent">{item.name}</Link> */}
-                  </td>
-                  <td>{item.email}</td>
-                  <td>{formatTimestamp(item.last_login)}</td>
-                  <td>{item.logins_count}</td>
-                  <td>{item.identities[0].connection}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        {!localStorage.getItem("auth_access_token") && (
-          <div>
-            <h6>
-              No user's found <FaUser style={{ marginBottom: "5px" }} />{" "}
-            </h6>
-          </div>
-        )}
-      </div>
-
-      {localStorage.getItem("auth_access_token") && (
+      {loadSpinner && <AppSpinner/>}
+      {!loadSpinner && (
+        <div className="container" style={{ height: "499px" }}>
+          {" "}
+          <hr />
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Last Login</th>
+                <th>Logins</th>
+                <th>Connection</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems &&
+                currentItems.map((item) => (
+                  <tr key={item.user_id}>
+                    <td>
+                      <Link to={`/users/${item.user_id}`}>{item.name}</Link>
+                      {/* <Link to="nestedContent">{item.name}</Link> */}
+                    </td>
+                    <td>{item.email}</td>
+                    <td>{formatTimestamp(item.last_login)}</td>
+                    <td>{item.logins_count}</td>
+                    <td>{item.identities[0].connection}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          {!localStorage.getItem("auth_access_token") && (
+            <div>
+              <h6>
+                No user's found <FaUser style={{ marginBottom: "5px" }} />{" "}
+              </h6>
+            </div>
+          )}
+        </div>
+      )}
+      {!loadSpinner && localStorage.getItem("auth_access_token") && (
         <div className="paginator container">
           <Pagination
             currentPage={currentPage}

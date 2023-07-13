@@ -1,12 +1,10 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import ModalDialog from "../UserDetails";
-import ContentOutlet from "./ContentOutlet";
 
 const Content = () => {
   return (
     <div>
-      <Outlet/>
+      <Outlet />
     </div>
   );
 };

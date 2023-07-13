@@ -42,8 +42,6 @@ function App() {
                   ></Route>
                 </Route>
                 <Route path="roles" element={"Roles"}></Route>
-                {/* <Route index path="GROUPS" element={"grp"}></Route>
-                  <Route path="ALL GROUPS" element={"grpall"}></Route> */}
               </Route>
             </Route>
           </Route>
