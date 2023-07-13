@@ -7,6 +7,7 @@ import { CodeSnippet } from "./Utils/CodeSnippet";
 import NestedContentOutlet from "./Components/Contents/NestedContentOutlet";
 import UserGroups from "./Components/Users/UserGroups";
 import { AllGroupTable, AllGroupsContent } from "./Components/Users/Groups";
+import ModalDialog from "./Components/UserDetails";
 
 function App() {
   return (
@@ -35,9 +36,12 @@ function App() {
                   <Route
                     index
                     element={
+                      <>
                       <AllGroupsContent
                         description={process.env.REACT_APP_AUTH_GROUPS_DESC}
                       />
+                      <ModalDialog/>
+                      </>
                     }
                   ></Route>
                 </Route>

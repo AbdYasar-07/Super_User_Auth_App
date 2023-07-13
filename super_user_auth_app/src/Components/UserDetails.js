@@ -5,7 +5,8 @@ import Axios from '../Utils/Axios';
 const ModalDialog = () => {
     const [showModal, setShowModal] = useState(false);
     const [checkboxData, setCheckboxData] = useState([]);
-
+    const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+    const [GroupsOfUsers, setGroupsOfUsers] = useState([]);
     useEffect(() => {
         // Fetch checkbox data from API
         const fetchData = async () => {
@@ -13,17 +14,18 @@ const ModalDialog = () => {
                 const total_groups_response = await Axios('https://dev-34chvqyi4i2beker.jp.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/api/groups',
                     'GET',
                     null,
-                    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkNLM1RXYkZRcGFjV1NET3Rxc3VoNSJ9.eyJpc3MiOiJodHRwczovL2Rldi0zNGNodnF5aTRpMmJla2VyLmpwLmF1dGgwLmNvbS8iLCJzdWIiOiJLVHg1cnNqWTRVUXBjYkRrYlJrRkx6YWlVRGxzTk5MREBjbGllbnRzIiwiYXVkIjoidXJuOmF1dGgwLWF1dGh6LWFwaSIsImlhdCI6MTY4OTA5NTc1OSwiZXhwIjoxNjg5MTgyMTU5LCJhenAiOiJLVHg1cnNqWTRVUXBjYkRrYlJrRkx6YWlVRGxzTk5MRCIsInNjb3BlIjoicmVhZDp1c2VycyByZWFkOmFwcGxpY2F0aW9ucyByZWFkOmNvbm5lY3Rpb25zIHJlYWQ6Y29uZmlndXJhdGlvbiByZWFkOmdyb3VwcyByZWFkOnJvbGVzIHJlYWQ6cGVybWlzc2lvbnMgcmVhZDpyZXNvdXJjZS1zZXJ2ZXIiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.q4tKOIiAKLD_LU9EcjYDal7MaTRwz9l4R_-FYjWuDyPfO8MwdWc5yr4cLoA9UYgkHbagSr-EfTRLEU4X1kgV88r7XR4DqHJdLX1x1gPoHZ17lBdOCmiik7J0hoRu1p2AnfHaBFJTJGYgR-lp6PRw-ScnTSsUc3aBq3v_XlaxoOGVJ-PvqkwPocFurQP_GY8jpSVufOVZE7Ds-WNBj5BUJOLI5cFkknR3Ek-bTngyR8LV5lLXvspEIqUvmkSl8aNw31cep9BsdS__GVQDtGc8ZsBFOLtDSZWUlsqbESVDQDGeo-cf-q0RModT-qc2zski7awZoWD-2YP5jDORmUV0EQ'
+                    localStorage.getItem('auth_access_token')
                 );
                 const total_groups = total_groups_response.groups;
-                const groups_of_user = await Axios('https://dev-34chvqyi4i2beker.jp.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/api/users/auth0|64a7cf2f24a711a5b957671c/groups',
+                await Axios('https://dev-34chvqyi4i2beker.jp.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/api/users/auth0|64a7cf2f24a711a5b957671c/groups',
                     'GET',
                     null,
-                    'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkNLM1RXYkZRcGFjV1NET3Rxc3VoNSJ9.eyJpc3MiOiJodHRwczovL2Rldi0zNGNodnF5aTRpMmJla2VyLmpwLmF1dGgwLmNvbS8iLCJzdWIiOiJLVHg1cnNqWTRVUXBjYkRrYlJrRkx6YWlVRGxzTk5MREBjbGllbnRzIiwiYXVkIjoidXJuOmF1dGgwLWF1dGh6LWFwaSIsImlhdCI6MTY4OTA5NTc1OSwiZXhwIjoxNjg5MTgyMTU5LCJhenAiOiJLVHg1cnNqWTRVUXBjYkRrYlJrRkx6YWlVRGxzTk5MRCIsInNjb3BlIjoicmVhZDp1c2VycyByZWFkOmFwcGxpY2F0aW9ucyByZWFkOmNvbm5lY3Rpb25zIHJlYWQ6Y29uZmlndXJhdGlvbiByZWFkOmdyb3VwcyByZWFkOnJvbGVzIHJlYWQ6cGVybWlzc2lvbnMgcmVhZDpyZXNvdXJjZS1zZXJ2ZXIiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.q4tKOIiAKLD_LU9EcjYDal7MaTRwz9l4R_-FYjWuDyPfO8MwdWc5yr4cLoA9UYgkHbagSr-EfTRLEU4X1kgV88r7XR4DqHJdLX1x1gPoHZ17lBdOCmiik7J0hoRu1p2AnfHaBFJTJGYgR-lp6PRw-ScnTSsUc3aBq3v_XlaxoOGVJ-PvqkwPocFurQP_GY8jpSVufOVZE7Ds-WNBj5BUJOLI5cFkknR3Ek-bTngyR8LV5lLXvspEIqUvmkSl8aNw31cep9BsdS__GVQDtGc8ZsBFOLtDSZWUlsqbESVDQDGeo-cf-q0RModT-qc2zski7awZoWD-2YP5jDORmUV0EQ'
-                );
-                const rem_groups = total_groups.filter(item => !groups_of_user.some(obj => obj._id === item._id));
-                setCheckboxData(rem_groups);
-                console.log('res', total_groups_response);
+                    localStorage.getItem('auth_access_token')
+                ).then((response) => {
+                    setGroupsOfUsers(response);
+                    const rem_groups = total_groups.filter(item => !response.some(obj => obj._id === item._id));
+                    setCheckboxData(rem_groups);
+                })
                 console.log('state', checkboxData);
             } catch (error) {
                 console.error(error);
@@ -41,23 +43,98 @@ const ModalDialog = () => {
         setShowModal(false);
     };
 
+    const handleCheckboxChange = (checkboxId) => {
+        const updatedCheckboxes = [...selectedCheckboxes];
+
+        if (updatedCheckboxes.includes(checkboxId)) {
+            updatedCheckboxes.splice(updatedCheckboxes.indexOf(checkboxId), 1);
+        } else {
+            updatedCheckboxes.push(checkboxId);
+        }
+
+        setSelectedCheckboxes(updatedCheckboxes);
+    };
+
+    const handleAddUserToGroups = async () => {
+        try {
+            // Make API call to save changes
+            const response = await Axios('https://dev-34chvqyi4i2beker.jp.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/api/users/auth0|64a7cf2f24a711a5b957671c/groups',
+                'PATCH',
+                selectedCheckboxes,
+                localStorage.getItem('auth_access_token')
+            );
+
+            console.log(response); // Handle the API response as needed
+
+            closeModal(); // Close the modal after successfully saving changes
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div>
             <button className="btn btn-primary" onClick={openModal}>
                 + ADD USER TO GROUPS
             </button>
             {showModal && (
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">Modal Heading</h5>
-                            <button type="button" className="close" onClick={closeModal}>
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                            <p>Add User to one or more groups</p>
-                            {/* <ul>
+                <>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Group Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* {groups_of_user.map((g) => (
+                            return(
+                                    <tr key={g._id}>
+                                    <td>
+                                        <div>{g.name}</div>
+                                    </td>
+                                </tr>
+                                )
+                            ))} */}
+                            {GroupsOfUsers.map((response) => {
+                                return (
+                                    <tr key={response._id}>
+                                        <td>
+                                            <div>{response.name}</div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+
+                    {/* <table>
+                        <thead>
+                            <tr>
+                                <th>Head</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div>body</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table> */}
+
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    Modal Heading
+                                </h5>
+                                <button type="button" className="close" onClick={closeModal}>
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Add User to one or more groups</p>
+                                {/* <ul>
                                 {checkboxData.map((checkbox) => (
                                     <li key={checkbox._id} style={{marginLeft: '1px'}}>
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -69,40 +146,44 @@ const ModalDialog = () => {
                                     </li>
                                 ))}
                             </ul> */}
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {checkboxData.map((checkbox) => (
-                                        <tr key={checkbox.id}>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <input type="checkbox" id={checkbox.id} style={{ marginRight: '5px' }} />
-                                                    <label htmlFor={checkbox.id}>{checkbox.name}</label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'right', marginLeft: '70px' }}>{checkbox.description}</div>
-                                            </td>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Description</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                CANCEL
-                            </button>
-                            <button type="button" className="btn btn-primary">
-                                ADD
-                            </button>
+                                    </thead>
+                                    <tbody>
+                                        {checkboxData.map((checkbox) => (
+                                            <tr key={checkbox._id}>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <input type="checkbox" id={checkbox._id} style={{ marginRight: '5px' }}
+                                                            checked={selectedCheckboxes.includes(checkbox._id)}
+                                                            onChange={() => handleCheckboxChange(checkbox._id)}
+                                                        />
+                                                        <label htmlFor={checkbox.id}>{checkbox.name}</label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'right', marginLeft: '70px' }}>{checkbox.description}</div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                                    CANCEL
+                                </button>
+                                <button type="button" className="btn btn-primary" onClick={handleAddUserToGroups}>
+                                    ADD
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </>
             )}
             {/* {showModal && (
         // <div className="modal" tabIndex="-1" role="dialog">
