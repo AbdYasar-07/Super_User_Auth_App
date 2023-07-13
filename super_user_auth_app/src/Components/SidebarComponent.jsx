@@ -3,6 +3,7 @@ import "./Styles/SidebarComponent.css";
 import Content from "./Contents/Content";
 import { FaUserAlt } from "react-icons/fa";
 import NestedContent from "./Contents/NestedContents";
+import { Link, Outlet } from "react-router-dom";
 
 const SidebarComponent = () => {
   return (
@@ -34,10 +35,13 @@ const SidebarComponent = () => {
                 // style={{marginTop:"50px",marginLeft:"40px"}}
               >
                 <li className="nav-item mt-2">
-                  <a className="links nav-link align-middle px-0">
+                  <Link
+                    to={"/users"}
+                    className="links nav-link align-middle px-0"
+                  >
                     <i className="fs-4 bi-house"></i>{" "}
                     <span className="ms-1 d-none d-sm-inline">User</span>
-                  </a>
+                  </Link>
                 </li>
                 <li className=" mt-2">
                   <a
@@ -65,8 +69,7 @@ const SidebarComponent = () => {
             </div>
           </div>
           <div className="col py-3">
-            <Content />
-            <NestedContent/>
+            <Content/>
           </div>
         </div>
       </div>

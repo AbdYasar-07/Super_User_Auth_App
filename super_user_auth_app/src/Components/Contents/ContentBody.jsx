@@ -4,6 +4,7 @@ import Axios from "../../Utils/Axios";
 import Pagination from "../../Utils/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
 import { FaUser } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const ContentBody = () => {
   const [data, setData] = useState([]);
@@ -144,7 +145,10 @@ const ContentBody = () => {
             {currentItems &&
               currentItems.map((item) => (
                 <tr key={item.user_id}>
-                  <td>{item.name}</td>
+                  <td>
+                    <Link to={`/users/${item.user_id}`}>{item.name}</Link>
+                    {/* <Link to="nestedContent">{item.name}</Link> */}
+                  </td>
                   <td>{item.email}</td>
                   <td>{formatTimestamp(item.last_login)}</td>
                   <td>{item.logins_count}</td>
