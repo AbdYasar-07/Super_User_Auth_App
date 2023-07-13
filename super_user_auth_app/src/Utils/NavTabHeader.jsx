@@ -8,11 +8,15 @@ function NavTabHeader() {
   return (
     <>
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-        {value.map((neadTabVAlue, index) => {
+        {value.map((neadTabValue, index) => {
           return (
             <li class="nav-item" role="presentation">
               <button
-                class={`${index === 0 ? "nav-link active btn-primary " :"nav-link  btn-primary"}` + "text-decoration-none"}
+                class={`${
+                  index === 0
+                    ? "nav-link active btn-primary"
+                    : "nav-link btn-primary"
+                } text-decoration-none`}
                 id="pills-home-tab"
                 data-bs-toggle="pill"
                 data-bs-target="#pills-home"
@@ -21,7 +25,12 @@ function NavTabHeader() {
                 aria-controls="pills-home"
                 aria-selected="true"
               >
-                <Link style={{textDecoration:"none",color:"#000"}} to={neadTabVAlue}>{neadTabVAlue}</Link>
+                <Link
+                  style={{ textDecoration: "none", color: "#000" }}
+                  to={neadTabValue}
+                >
+                  {neadTabValue}
+                </Link>
               </button>
             </li>
           );

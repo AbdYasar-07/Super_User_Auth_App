@@ -1,9 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 function Tabs({ tabs }) {
+  const { userId } = useParams();
+
   return (
-    <div>
+    <div className="d-flex container">
       <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
           {tabs.map((tab, index) => {
@@ -19,7 +21,10 @@ function Tabs({ tabs }) {
                 aria-controls="nav-home"
                 aria-selected="true"
               >
-                <Link className="text-decoration-none" to={tab}>
+                <Link
+                  className="text-decoration-none"
+                  to={`/users/${userId}/${tab.toLowerCase()}`}
+                >
                   {" "}
                   {tab}
                 </Link>

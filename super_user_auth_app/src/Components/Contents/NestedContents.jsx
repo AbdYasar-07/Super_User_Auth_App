@@ -3,59 +3,26 @@ import Axios from "../../Utils/Axios";
 import Groups, { ALLGroupsContent, AllGroupTable } from "../Users/Groups";
 import NavTabHeader from "../../Utils/NavTabHeader";
 import NavTabBody from "../../Utils/NavTabBody";
-import { Outlet, useParams } from "react-router";
+import { Outlet, useParams, useNavigate } from "react-router";
 import Tabs from "./Tabs";
 import { CodeSnippet } from "../../Utils/CodeSnippet";
 import { stringify } from "json5";
+import "../Styles/NestedContent.css";
+import NestedContentOutlet from "./NestedContentOutlet";
+
 const NestedContent = () => {
   const [userProfile, setUserProfile] = useState({}); // nested content header
   const [userRoles, setUserRoles] = useState(null); // nested content header
   const [userGroups, setUserGroups] = useState(null); // nested content header
   const { userId } = useParams();
+  const navigate = useNavigate();
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
-
-  // const [message,setMessage]=useState(null);
-  let data = {
-    created_at: "2023-07-06T07:29:01.948Z",
-    email: "staryasar07@gmail.com",
-    email_verified: true,
-    identities: [
-      {
-        connection: "Username-Password-Authentication",
-        provider: "auth0",
-        user_id: "64a66d3d4f13f73a8c1a5c87",
-        isSocial: false,
-      },
-    ],
-    name: "staryasar07@gmail.com",
-    nickname: "staryasar07",
-    picture:
-      "https://s.gravatar.com/avatar/7146ba5f4625a9e9b64e415ff4afde98?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fst.png",
-    updated_at: "2023-07-12T16:46:15.003Z",
-    user_id: "auth0|64a66d3d4f13f73a8c1a5c87",
-    multifactor: ["guardian"],
-    multifactor_last_modified: "2023-07-06T07:31:01.970Z",
-    user_metadata: {
-      role: "admim",
-    },
-    app_metadata: {
-      authorization: {
-        groups: ["C", "C_CA"],
-        roles: [],
-        permissions: [],
-      },
-    },
-    last_ip: "106.51.3.46",
-    last_login: "2023-07-12T13:07:56.590Z",
-    logins_count: 45,
-  };
-  const message = JSON.stringify(data, null, 2);
 
   const GetUserProfile = async (accessToken, userId) => {
     await Axios(resource + `/users/${userId}`, "GET", null, accessToken)
       .then((userProfile) => {
         setUserProfile(userProfile);
-        console.log();
+        localStorage.setItem("user_profile", JSON.stringify(userProfile));
       })
       .catch((error) => {
         console.error("Error while fetching user information ::", error);
@@ -96,13 +63,17 @@ const NestedContent = () => {
       );
     };
 
+    navigate(`/users/${userId}/profile`);
     callUserProfile();
   }, []);
   return (
     <>
       <div
-        className="d-flex align-items-center pt-2 pb-2 container"
-        style={{ backgroundColor: "rgb(204 204 204 / 18%)" }}
+        className="d-flex align-items-center pt-2 pb-2 container profileHeader"
+        style={{
+          backgroundColor: "rgb(204 204 204 / 18%)",
+          height: "150px !important",
+        }}
       >
         <div className="col-2">
           <img
@@ -118,13 +89,7 @@ const NestedContent = () => {
           <h5 className="fw-light text-secondary">{userProfile.email}</h5>
         </div>
       </div>
-      {/* <NavTabHeader /> */}
       <Tabs tabs={["Profile", "Groups", "Roles"]} />
-      <Outlet/>
-      {/* <CodeSnippet title="User Profile" code={message} />
-      <NavTabBody />
-      <ALLGroupsContent />
-      <AllGroupTable /> */}
     </>
   );
 };
