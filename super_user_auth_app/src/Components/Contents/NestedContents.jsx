@@ -51,8 +51,8 @@ const NestedContent = () => {
 
   const fetchUserInformation = async (accessToken, userId) => {
     await GetUserProfile(accessToken, userId);
-    await GetUserGroups(accessToken, userId);
-    await GetUserRoles(accessToken, userId);
+    // await GetUserGroups(accessToken, userId);
+    // await GetUserRoles(accessToken, userId);
   };
 
   useEffect(() => {

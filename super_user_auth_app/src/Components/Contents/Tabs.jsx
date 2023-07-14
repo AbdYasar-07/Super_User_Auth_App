@@ -1,9 +1,13 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function Tabs({ tabs }) {
   const { userId } = useParams();
+  const navigate=useNavigate();
 
+  const tabNavigation = (paths) => { 
+    navigate(`/users/${userId}/${paths.toLowerCase()}`);
+  };
   return (
     <div className="d-flex container">
       <nav>
@@ -20,14 +24,9 @@ function Tabs({ tabs }) {
                 role="tab"
                 aria-controls="nav-home"
                 aria-selected="true"
+                onClick={() => tabNavigation(tab)}
               >
-                <Link
-                  className="text-decoration-none"
-                  to={`/users/${userId}/${tab.toLowerCase()}`}
-                >
-                  {" "}
-                  {tab}
-                </Link>
+                {tab}
               </button>
             );
           })}

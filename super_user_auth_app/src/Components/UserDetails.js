@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Axios from '../Utils/Axios';
+import { useParams } from 'react-router-dom';
 //import apiUtils from './apiUtils';
 
 const ModalDialog = () => {
@@ -7,6 +8,7 @@ const ModalDialog = () => {
     const [checkboxData, setCheckboxData] = useState([]);
     const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
     const [GroupsOfUsers, setGroupsOfUsers] = useState([]);
+    const { userId } = useParams();
     useEffect(() => {
         // Fetch checkbox data from API
         const fetchData = async () => {
@@ -72,6 +74,23 @@ const ModalDialog = () => {
         }
     };
 
+    const handleDeleteUserToGroups = async (groupId) => {
+        try {
+            // Make API call to save changes
+            const response = await Axios('https://dev-34chvqyi4i2beker.jp.webtask.run/adf6e2f2b84784b57522e3b19dfc9201/api/groups'+`/${groupId}`+'/members',
+                'DELETE',
+                [userId],
+                localStorage.getItem('auth_access_token')
+            );
+
+            console.log(response); // Handle the API response as needed
+
+            closeModal(); // Close the modal after successfully saving changes
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div>
             <button className="btn btn-primary" onClick={openModal}>
@@ -100,6 +119,9 @@ const ModalDialog = () => {
                                     <tr key={response._id}>
                                         <td>
                                             <div>{response.name}</div>
+                                        </td>
+                                        <td>
+                                            <button onClick={() => handleDeleteUserToGroups(response._id)}>Delete</button>
                                         </td>
                                     </tr>
                                 )

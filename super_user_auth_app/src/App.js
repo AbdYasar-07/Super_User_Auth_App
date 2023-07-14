@@ -6,9 +6,12 @@ import ContentOutlet from "./Components/Contents/ContentOutlet";
 import { CodeSnippet } from "./Utils/CodeSnippet";
 import NestedContentOutlet from "./Components/Contents/NestedContentOutlet";
 import UserGroups from "./Components/Users/UserGroups";
-import { AllGroupTable, AllGroupsContent } from "./Components/Users/Groups";
+import Groups, {
+  AllGroupTable,
+  AllGroupsContent,
+} from "./Components/Users/Groups";
+import Roles from "./Components/Users/Roles";
 import ModalDialog from "./Components/UserDetails";
-
 function App() {
   return (
     <div className="App">
@@ -23,6 +26,7 @@ function App() {
                   path="profile"
                   element={
                     <CodeSnippet
+
                       title="User Profile"
                       code={JSON.stringify(
                         JSON.parse(localStorage.getItem("user_profile")),
@@ -32,20 +36,8 @@ function App() {
                     />
                   }
                 ></Route>
-                <Route path="groups" element={<UserGroups />}>
-                  <Route
-                    index
-                    element={
-                      <>
-                      <AllGroupsContent
-                        description={process.env.REACT_APP_AUTH_GROUPS_DESC}
-                      />
-                      <ModalDialog/>
-                      </>
-                    }
-                  ></Route>
-                </Route>
-                <Route path="roles" element={"Roles"}></Route>
+                <Route path="groups" element={<Groups />}></Route>
+                <Route path="roles" element={<Roles/>}></Route>
               </Route>
             </Route>
           </Route>

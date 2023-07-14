@@ -1,65 +1,23 @@
 import React from "react";
 import { FaMixer } from "react-icons/fa";
-//
-export const AllGroupsContent = ({ description }) => {
+import NavTabHeader from "../../Utils/NavTabHeader";
+import NavTabBody from "../../Utils/NavTabBody";
+import NavTabBodyButton from "../../Utils/NavTabBodyButton";
+import NavTabTable from "../../Utils/NavTabTable";
+
+
+const Groups = () => {
   return (
-    <div className="container mt-4">
-      <p>{description}</p>
+    <div className="container">
+      <NavTabHeader showTab={true} tabsHeaders={["GROUPS", "ALL GROUPS"]} />
+      <NavTabBody
+        showDesc={true}
+        description={process.env.REACT_APP_AUTH_GROUPS_DESC}
+      />
+      <NavTabBodyButton showButton={true} buttonLabel={"ADD USERS TO GROUPS"} />
+      <NavTabTable columns={["Name", "Description"]} showTable={true} />
     </div>
   );
 };
 
-export const AllGroupTable = ({ tableRows}) => {
-  let tabvalue = "AllGrop";
-  let tableRow = ["Name", "Description"];
-  let tableColums = [
-    {
-      id: 12,
-      groupName: "C",
-      GroupDescription: "	Concepcion Group Top level",
-    },
-    {
-      id: 13,
-      groupName: "C_B",
-      GroupDescription: "	Concepcion Group Top level",
-    },
-  ];
-  const getId = (IdValue) => {
-    console.log(IdValue);
-  };
-  return (
-    <>
-      {tabvalue == "ALL GROUPS" ||
-        ("GROUPS" && (
-          <table class="table container">
-            <thead>
-              <tr>
-                {tableRow.map((tableRow) => {
-                  return <th>{tableRow}</th>;
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {tableColums.map((tabColumns, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{tabColumns.groupName}</td>
-                    <td>{tabColumns.GroupDescription}</td>
-                    <td
-                      id={tabColumns.id}
-                      style={{
-                        display: `${tabvalue == "AllGroup" ? "none" : "block"}`,
-                      }}
-                      onClick={() => getId(tabColumns.id)}
-                    >
-                      <FaMixer />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ))}
-    </>
-  );
-};
+export default Groups;
