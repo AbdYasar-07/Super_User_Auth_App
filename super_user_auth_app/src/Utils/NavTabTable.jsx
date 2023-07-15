@@ -2,8 +2,18 @@ import React, { useEffect, useState } from "react";
 import Axios from "./Axios";
 import { useParams } from "react-router";
 import AppSpinner from "./AppSpinner";
+import { FaTimes } from "react-icons/fa";
 
-const NavTabTable = ({ showTable, columns }) => {
+const NavTabTable = ({
+  showTable,
+  columns,
+  isAdded,
+  setIsAdded,
+  showEditButton,
+  scope,
+  isDeleted,
+  setIsDeleted,
+}) => {
   const [userGroups, setUserGroups] = useState([]);
   const { userId } = useParams();
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
@@ -13,6 +23,7 @@ const NavTabTable = ({ showTable, columns }) => {
     await Axios(resource + `/users/${userId}/groups`, "GET", null, accessToken)
       .then((groups) => {
         setUserGroups(groups);
+        setIsAdded(false);
       })
       .catch((error) => {
         console.error("Error while fetching roles ::", error);
@@ -20,6 +31,28 @@ const NavTabTable = ({ showTable, columns }) => {
       .finally(() => {
         setLoadSpinner(false);
       });
+  };
+
+  const remove = async (id, scope) => {
+    const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
+    switch (scope?.toLowerCase()) {
+      case "group": {
+        await Axios(
+          resource + `/groups/${id}/members`,
+          "DELETE",
+          [`${userId}`],
+          localStorage.getItem("auth_access_token")
+        )
+          .then((response) => {
+            console.log("***", response);
+            setIsDeleted(true);
+          })
+          .catch((error) => {
+            console.error("Error while removing user from a group :::", error);
+          });
+        break;
+      }
+    }
   };
 
   useEffect(() => {
@@ -32,7 +65,8 @@ const NavTabTable = ({ showTable, columns }) => {
     };
 
     callUserGroups();
-  }, []);
+    console.log("User groups :", userGroups);
+  }, [isAdded, isDeleted]);
 
   return (
     <>
@@ -60,6 +94,16 @@ const NavTabTable = ({ showTable, columns }) => {
                       <td key={index} id={group._id}>
                         {group.description}
                       </td>
+                      {showEditButton && (
+                        <td>
+                          <button
+                            className="btn btn-danger"
+                            onClick={(e) => remove(group._id, scope)}
+                          >
+                            <FaTimes />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

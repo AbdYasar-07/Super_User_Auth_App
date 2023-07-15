@@ -1,6 +1,21 @@
 import React from "react";
+import { useNavigate } from "react-router";
 
 function NavTabHeader({ showTab, tabsHeaders }) {
+  const navigate = useNavigate();
+
+  const handleNavigation = (header) => {
+    switch (header.toLowerCase()) {
+      case "groups": {
+        navigate("show");
+        break;
+      }
+      default: {
+        navigate(`${header.toLowerCase()}`);
+      }
+    }
+  };
+
   return (
     <div className="container mt-4">
       {showTab && (
@@ -23,6 +38,9 @@ function NavTabHeader({ showTab, tabsHeaders }) {
                   role="tab"
                   aria-controls="pills-home"
                   aria-selected="true"
+                  onClick={() => {
+                    handleNavigation(header.trim().split(" ").join(""));
+                  }}
                 >
                   {header}
                 </button>

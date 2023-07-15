@@ -12,6 +12,7 @@ import Groups, {
 } from "./Components/Users/Groups";
 import Roles from "./Components/Users/Roles";
 import ModalDialog from "./Components/UserDetails";
+import GroupsOutlet from "./Components/Contents/GroupsOutlet";
 function App() {
   return (
     <div className="App">
@@ -26,7 +27,6 @@ function App() {
                   path="profile"
                   element={
                     <CodeSnippet
-
                       title="User Profile"
                       code={JSON.stringify(
                         JSON.parse(localStorage.getItem("user_profile")),
@@ -36,8 +36,11 @@ function App() {
                     />
                   }
                 ></Route>
-                <Route path="groups" element={<Groups />}></Route>
-                <Route path="roles" element={<Roles/>}></Route>
+                <Route path="groups" element={<GroupsOutlet />}>
+                  <Route path="show" element={<Groups />}></Route>
+                  <Route path="allgroups" element={"All Groups"}></Route>
+                </Route>
+                <Route path="roles" element={<Roles />}></Route>
               </Route>
             </Route>
           </Route>
