@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { FaMixer } from "react-icons/fa";
-import NavTabHeader from "../../Utils/NavTabHeader";
 import NavTabBody from "../../Utils/NavTabBody";
 import NavTabBodyButton from "../../Utils/NavTabBodyButton";
 import NavTabTable from "../../Utils/NavTabTable";
@@ -8,6 +6,9 @@ import NavTabTable from "../../Utils/NavTabTable";
 const Groups = () => {
   const [isAdded, setIsAdded] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const userName = localStorage.getItem("user_profile")
+    ? JSON.parse(localStorage.getItem("user_profile")).name
+    : "";
 
   useEffect(() => {
     setIsDeleted(false);
@@ -21,19 +22,24 @@ const Groups = () => {
       />
       <NavTabBodyButton
         showButton={true}
-        buttonLabel={"ADD USERS TO GROUPS"}
+        buttonLabel={"ADD USER TO GROUPS"}
         isAdded={isAdded}
         setIsAdded={setIsAdded}
+        isRoles={false}
+        scopes={"groups"}
+        dialogBoxHeader={`Add ${userName} to one or more groups`}
       />
       <NavTabTable
         columns={["Name", "Description", "Remove"]}
         showTable={true}
         isAdded={isAdded}
         setIsAdded={setIsAdded}
-        showEditButton={true}
+        showDeleteButton={true}
         scope={"Group"}
         isDeleted={isDeleted}
         setIsDeleted={setIsDeleted}
+        isUserAllGroups={false}
+        isRoles={false}
       />
     </div>
   );

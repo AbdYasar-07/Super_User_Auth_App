@@ -1,30 +1,31 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { useState, useEffect } from "react";
 import Axios from "../../Utils/Axios";
 import Pagination from "../../Utils/Pagination";
 import { useAuth0 } from "@auth0/auth0-react";
-import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import AppSpinner from "../../Utils/AppSpinner";
+import { FaUser } from "react-icons/fa";
 
 const ContentBody = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const { getAccessTokenSilently } = useAuth0();
-  const [loadSpinner, setLoadSpinner] = useState(false);
+  const [loadSpinner, setLoadSpinner] = useState(true);
+
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
 
   const fetchAccessToken = async () => {
     await getAccessTokenSilently()
-      .then((response) => {
+      .then(async (response) => {
         localStorage.setItem("access_token", response);
+        await fetchAuthorizationToken();
       })
       .catch((error) => {
         console.error("Error while fetching token", error);
-      })
-      .finally(() => {
-        console.log("fetched logged user's access token");
+        setLoadSpinner(false);
       });
   };
 
@@ -103,18 +104,13 @@ const ContentBody = () => {
           "Error while accessing authorization resource :::",
           error
         );
-      })
-      .finally(() => {
-        console.log("got the user's data");
       });
   };
 
   useEffect(() => {
-    setLoadSpinner(true);
     const fetchData = async () => {
       try {
         await fetchAccessToken();
-        await fetchAuthorizationToken();
       } catch (error) {
         console.error("error ::", error);
       }
@@ -125,13 +121,12 @@ const ContentBody = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data && data.slice(indexOfFirstItem, indexOfLastItem);
-  console.log(currentItems);
 
   const handlePageChange = (page) => setCurrentPage(page);
 
   return (
     <div>
-      {loadSpinner && <AppSpinner/>}
+      {loadSpinner && <AppSpinner />}
       {!loadSpinner && (
         <div className="container" style={{ height: "499px" }}>
           {" "}
@@ -152,7 +147,6 @@ const ContentBody = () => {
                   <tr key={item.user_id}>
                     <td>
                       <Link to={`/users/${item.user_id}`}>{item.name}</Link>
-                      {/* <Link to="nestedContent">{item.name}</Link> */}
                     </td>
                     <td>{item.email}</td>
                     <td>{formatTimestamp(item.last_login)}</td>
@@ -162,7 +156,7 @@ const ContentBody = () => {
                 ))}
             </tbody>
           </table>
-          {!localStorage.getItem("auth_access_token") && (
+          {!loadSpinner && !localStorage.getItem("auth_access_token") && (
             <div>
               <h6>
                 No user's found <FaUser style={{ marginBottom: "5px" }} />{" "}

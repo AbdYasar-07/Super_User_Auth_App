@@ -1,7 +1,6 @@
-import React from "react";
 import "../Components/Styles/CodeSnippets.css";
 
-export const CodeSnippet = ({ title, code=""}) => (
+export const CodeSnippet = ({ title, code = "" }) => (
   <div className="code-snippet">
     <span className="code-snippet__title">{title}</span>
     <div className="code-snippet__container">

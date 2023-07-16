@@ -2,10 +2,10 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import NestedContent from "./NestedContents";
 
-const NestedContentOutlet = () => {
+const NestedContentOutlet = ({setIsProfileRendered,isProfileRendered}) => {
   return (
     <div>
-      <NestedContent />
+      <NestedContent setIsProfileRendered={setIsProfileRendered}/>
       <Outlet />
     </div>
   );

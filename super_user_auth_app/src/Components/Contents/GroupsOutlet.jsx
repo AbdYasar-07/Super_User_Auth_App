@@ -7,6 +7,7 @@ const GroupsOutlet = () => {
 
   useEffect(() => {
     navigate("show");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

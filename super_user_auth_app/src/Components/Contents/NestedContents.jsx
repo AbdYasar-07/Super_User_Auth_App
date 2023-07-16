@@ -1,71 +1,35 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import Axios from "../../Utils/Axios";
-import Groups, { ALLGroupsContent, AllGroupTable } from "../Users/Groups";
-import NavTabHeader from "../../Utils/NavTabHeader";
-import NavTabBody from "../../Utils/NavTabBody";
-import { Outlet, useParams, useNavigate } from "react-router";
 import Tabs from "./Tabs";
-import { CodeSnippet } from "../../Utils/CodeSnippet";
-import { stringify } from "json5";
 import "../Styles/NestedContent.css";
-import NestedContentOutlet from "./NestedContentOutlet";
+import { useNavigate, useParams } from "react-router-dom";
 
-const NestedContent = () => {
-  const [userProfile, setUserProfile] = useState({}); // nested content header
-  const [userRoles, setUserRoles] = useState(null); // nested content header
-  const [userGroups, setUserGroups] = useState(null); // nested content header
+const NestedContent = ({setIsProfileRendered, isProfileRendered}) => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState({});
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
 
-  const GetUserProfile = async (accessToken, userId) => {
+  const getUserProfile = async (accessToken, userId) => {
     await Axios(resource + `/users/${userId}`, "GET", null, accessToken)
       .then((userProfile) => {
         setUserProfile(userProfile);
         localStorage.setItem("user_profile", JSON.stringify(userProfile));
+        setIsProfileRendered(true);
       })
       .catch((error) => {
         console.error("Error while fetching user information ::", error);
       });
   };
 
-  const GetUserRoles = async (accessToken, userId) => {
-    await Axios(resource + `/users/${userId}/roles`, "GET", null, accessToken)
-      .then((roles) => {
-        setUserRoles(roles);
-      })
-      .catch((error) => {
-        console.error("Error while fetching roles ::", error);
-      });
-  };
-
-  const GetUserGroups = async (accessToken, userId) => {
-    await Axios(resource + `/users/${userId}/groups`, "GET", null, accessToken)
-      .then((groups) => {
-        setUserGroups(groups);
-      })
-      .catch((error) => {
-        console.error("Error while fetching roles ::", error);
-      });
-  };
-
-  const fetchUserInformation = async (accessToken, userId) => {
-    await GetUserProfile(accessToken, userId);
-    // await GetUserGroups(accessToken, userId);
-    // await GetUserRoles(accessToken, userId);
-  };
-
   useEffect(() => {
     const callUserProfile = async () => {
-      await fetchUserInformation(
-        localStorage.getItem("auth_access_token") || "",
-        userId
-      );
+      await getUserProfile(localStorage.getItem("auth_access_token"), userId);
     };
-
-    navigate(`/users/${userId}/profile`);
     callUserProfile();
-  }, []);
+    navigate(`/users/${userId}/profile`);
+  }, [isProfileRendered]);
   return (
     <>
       <div

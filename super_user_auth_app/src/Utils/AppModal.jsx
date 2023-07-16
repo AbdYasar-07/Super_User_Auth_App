@@ -6,51 +6,80 @@ const AppModal = ({
   buttonLabel,
   dialogBoxHeader,
   tableRow,
-  DataSource,
   showButton,
   scopes,
   setIsAdded,
   isAdded,
+  isRoles,
+  isDeleted
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [checkboxData, setCheckboxData] = useState([]);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
-  const [GroupsOfUsers, setGroupsOfUsers] = useState([]);
   const { userId } = useParams();
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
 
-  useEffect(() => {
-    // Fetch checkbox data from API
-    const fetchData = async () => {
-      try {
-        const total_groups_response = await Axios(
-          resource + "/groups",
-          "GET",
-          null,
-          localStorage.getItem("auth_access_token")
+  const fetchData = async () => {
+    try {
+      const total_groups_response = await Axios(
+        resource + "/groups",
+        "GET",
+        null,
+        localStorage.getItem("auth_access_token")
+      );
+      const total_groups = await total_groups_response.groups;
+      await Axios(
+        resource + `/users/${userId}/groups`,
+        "GET",
+        null,
+        localStorage.getItem("auth_access_token")
+      ).then((response) => {
+        const rem_groups = total_groups.filter(
+          (item) => !response.some((obj) => obj._id === item._id)
         );
-        const total_groups = await total_groups_response.groups;
+        setCheckboxData(rem_groups);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRoles = async () => {
+    await Axios(
+      resource + `/roles`,
+      "GET",
+      null,
+      localStorage.getItem("auth_access_token")
+    )
+      .then(async (response) => {
+        const allRoles = response.roles;
         await Axios(
-          resource + `/users/${userId}/groups`,
+          resource + `/users/${userId}/roles`,
           "GET",
           null,
           localStorage.getItem("auth_access_token")
         ).then((response) => {
-          console.log("res", response);
-          if (response) {
-            setGroupsOfUsers(response);
-          }
-          const rem_groups = total_groups.filter(
+          const remRoles = allRoles.filter(
             (item) => !response.some((obj) => obj._id === item._id)
           );
-          setCheckboxData(rem_groups);
+          setCheckboxData(remRoles);
         });
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-  }, [showModal, isAdded]);
+      })
+      .catch((error) => {
+        console.error(
+          "Error while getting assigned roles to the user :::",
+          error
+        );
+      })
+      .finally(() => {});
+  };
+
+  useEffect(() => {
+
+    if (!isRoles) fetchData();
+    if (isRoles) fetchRoles();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal,isAdded,isDeleted]);
 
   const openModal = () => {
     setShowModal(true);
@@ -60,6 +89,7 @@ const AppModal = ({
     setSelectedCheckboxes([]);
     setShowModal(false);
   };
+
   const handleCheckboxChange = (checkboxId) => {
     const updatedCheckboxes = [...selectedCheckboxes];
 
@@ -71,26 +101,53 @@ const AppModal = ({
 
     setSelectedCheckboxes(updatedCheckboxes);
   };
-  const handleAddUserToGroups = async () => {
+
+  const addUserToGroups = async () => {
+    await Axios(
+      resource + `/users/${userId}/groups`,
+      "PATCH",
+      selectedCheckboxes,
+      localStorage.getItem("auth_access_token")
+    )
+      .then((response) => {
+        setIsAdded(true);
+        closeModal();
+      })
+      .catch((error) => {
+        console.error("Error while adding a user to group", error);
+      });
+  };
+
+  const addUserToRoles = async () => {
+    await Axios(
+      resource + `/users/${userId}/roles`,
+      "PATCH",
+      selectedCheckboxes,
+      localStorage.getItem("auth_access_token")
+    )
+      .then((response) => {
+        setIsAdded(true);
+        closeModal();
+      })
+      .catch((error) => {
+        console.error("Error while adding a user to role", error);
+      });
+  };
+
+  const handleAdd = async () => {
     try {
-      // Make API call to save changes
-      await Axios(
-        resource + `/users/${userId}/groups`,
-        "PATCH",
-        selectedCheckboxes,
-        localStorage.getItem("auth_access_token")
-      )
-        .then((response) => {
-          setIsAdded(true);
-          closeModal();
-        })
-        .catch((error) => {
-          console.error("Error while adding a user to group", error);
-        });
+      if (!isRoles) {
+        await addUserToGroups();
+      }
+
+      if (isRoles) {
+        await addUserToRoles();
+      }
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
     <>
       {showButton && (
@@ -134,56 +191,59 @@ const AppModal = ({
                           {tableRow?.map((tableRow, index) => {
                             return (
                               <>
-                                <th key={index}>{tableRow}</th>
+                                <th key={index + 1}>{tableRow}</th>
                               </>
                             );
                           })}
                         </tr>
                       </thead>
                       <tbody>
-                        {checkboxData.map((checkbox) => (
-                          <tr key={checkbox._id}>
-                            <td>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  id={checkbox._id}
-                                  style={{ marginRight: "5px" }}
-                                  checked={selectedCheckboxes.includes(
-                                    checkbox._id
-                                  )}
-                                  onChange={() =>
-                                    handleCheckboxChange(checkbox._id)
-                                  }
-                                />
-                                <label htmlFor={checkbox.id}>
-                                  {checkbox.name}
-                                </label>
-                              </div>
-                            </td>
-                            <td>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "right",
-                                  marginLeft: "70px",
-                                }}
-                              >
-                                {checkbox.description}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
+                        {checkboxData &&
+                          checkboxData.map((checkbox) => (
+                            <tr key={checkbox._id}>
+                              <td>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    id={checkbox._id}
+                                    style={{ marginRight: "5px" }}
+                                    checked={selectedCheckboxes.includes(
+                                      checkbox._id
+                                    )}
+                                    onChange={() =>
+                                      handleCheckboxChange(checkbox._id)
+                                    }
+                                  />
+                                  <label htmlFor={checkbox.id}>
+                                    {checkbox.name}
+                                  </label>
+                                </div>
+                              </td>
+                              <td>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "right",
+                                    marginLeft: "70px",
+                                  }}
+                                >
+                                  {checkbox.description}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
                 )}
-                {checkboxData?.length == 0 && <h5>No more {scopes} to add.</h5>}
+                {checkboxData?.length === 0 && (
+                  <h5>No more {scopes} to add.</h5>
+                )}
                 <div class="modal-footer">
                   {checkboxData && checkboxData.length > 0 && (
                     <>
@@ -198,7 +258,7 @@ const AppModal = ({
                       <button
                         type="button"
                         class="btn btn-primary"
-                        onClick={handleAddUserToGroups}
+                        onClick={handleAdd}
                       >
                         ADD
                       </button>

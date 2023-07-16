@@ -1,10 +1,14 @@
 import axios from "axios";
 
-const Axios = async (url, method = "get", data = null, token = null) => {
+const Axios = async (url, method = "get", data = null, token = null, isManagementApi) => {
   try {
     const headers = {};
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    if(isManagementApi){
+      headers["content-type"] = "application/json"
     }
 
     const response = await axios.request({

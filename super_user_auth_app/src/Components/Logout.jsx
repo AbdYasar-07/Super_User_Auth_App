@@ -9,6 +9,7 @@ const Logout = () => {
       .then(() => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("auth_access_token");
+        localStorage.removeItem("user_profile");
       })
       .catch((error) => {
         console.error("Error ::", error);

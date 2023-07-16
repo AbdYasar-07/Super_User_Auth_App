@@ -9,15 +9,21 @@ const NavTabTable = ({
   columns,
   isAdded,
   setIsAdded,
-  showEditButton,
+  showDeleteButton,
   scope,
   isDeleted,
   setIsDeleted,
+  isUserAllGroups,
+  isUserAllRoles,
+  isRoles,
 }) => {
   const [userGroups, setUserGroups] = useState([]);
   const { userId } = useParams();
   const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
   const [loadSpinner, setLoadSpinner] = useState(false);
+  const [userAllGroups, setUserAllGroups] = useState([]);
+  const [userRoles, setUserRoles] = useState([]);
+  const [userAllRoles, setUserAllRoles] = useState([]);
 
   const getUserGroups = async (accessToken, userId) => {
     await Axios(resource + `/users/${userId}/groups`, "GET", null, accessToken)
@@ -26,14 +32,126 @@ const NavTabTable = ({
         setIsAdded(false);
       })
       .catch((error) => {
-        console.error("Error while fetching roles ::", error);
+        console.error("Error while fetching user groups :::", error);
       })
       .finally(() => {
         setLoadSpinner(false);
       });
   };
 
+  const getUserAllGroups = async (accessToken, userId) => {
+    await Axios(
+      resource + `/users/${userId}/groups/calculate`,
+      "GET",
+      null,
+      accessToken
+    )
+      .then((response) => {
+        setUserAllGroups(response);
+      })
+      .catch((error) => {
+        console.error(
+          "Error while getting user's calculated all groups :::",
+          error
+        );
+      })
+      .finally(() => setLoadSpinner(false));
+  };
+
+  const fetchUserRoles = async () => {
+    await Axios(
+      resource + `/users/${userId}/roles`,
+      "GET",
+      null,
+      localStorage.getItem("auth_access_token")
+    ).then(async (roles) => {
+      let appIds = [];
+      roles.forEach((role) => appIds.push(role.applicationId));
+      await getManagementToken().then(async (tkn) => {
+        await getClientInformation(tkn, appIds, isUserAllRoles, roles).then(
+          () => {
+            setLoadSpinner(false);
+          }
+        );
+      });
+    });
+  };
+
+  const getUserAllRoles = async (accessToken, userId) => {
+    await Axios(
+      resource + `/users/${userId}/roles/calculate`,
+      "GET",
+      null,
+      accessToken
+    ).then(async (allRoles) => {
+      let appIds = [];
+      allRoles.forEach((role) => appIds.push(role.applicationId));
+      await getManagementToken().then(async (tkn) => {
+        await getClientInformation(tkn, appIds, isUserAllRoles, allRoles).then(
+          () => {
+            setLoadSpinner(false);
+          }
+        );
+      });
+    });
+  };
+
+  const getManagementToken = async () => {
+    let managementApi = process.env.REACT_APP_MANAGEMENT_API;
+    let data = {
+      client_id: process.env.REACT_APP_AUTH_MANAGEMENT_CLIENT_ID,
+      client_secret: process.env.REACT_APP_AUTH_MANAGEMENT_CLIENT_SECRET,
+      audience: process.env.REACT_APP_AUTH_MANAGEMENT_AUDIENCE,
+      grant_type: "client_credentials",
+    };
+
+    return await Axios(managementApi, "POST", data, null, true)
+      .then((response) => {
+        return response?.access_token;
+      })
+      .catch((error) => {
+        console.error("error ::", error);
+      });
+  };
+
+  const getClientInformation = async (
+    managementToken,
+    appIds,
+    isUserAllRoles,
+    roles
+  ) => {
+    const clients = process.env.REACT_APP_AUTH_GET_CLIENT;
+    const promises = appIds.map((appId) => {
+      return Axios(
+        clients + `/${appId}?fields=client_id%2Cname`,
+        "GET",
+        null,
+        managementToken,
+        false
+      );
+    });
+
+    const responses = await Promise.all(promises);
+    const map = new Map();
+    responses.forEach((response) => {
+      map.set(response?.client_id, response?.name);
+    });
+
+    roles.map((role) => {
+      role.applicationName = map.get(role.applicationId);
+      return { ...role };
+    });
+    if (!isUserAllRoles) {
+      setUserRoles(roles);
+    }
+
+    if (isUserAllRoles) {
+      setUserAllRoles(roles);
+    }
+  };
+
   const remove = async (id, scope) => {
+    setLoadSpinner(true);
     const resource = process.env.REACT_APP_AUTH_EXT_RESOURCE;
     switch (scope?.toLowerCase()) {
       case "group": {
@@ -44,28 +162,69 @@ const NavTabTable = ({
           localStorage.getItem("auth_access_token")
         )
           .then((response) => {
-            console.log("***", response);
             setIsDeleted(true);
           })
           .catch((error) => {
-            console.error("Error while removing user from a group :::", error);
+            console.error(
+              `Error while removing user from a ${scope} :::`,
+              error
+            );
           });
         break;
+      }
+      case "roles": {
+        await Axios(
+          resource + `/users/${userId}/roles`,
+          "DELETE",
+          [`${id}`],
+          localStorage.getItem("auth_access_token")
+        )
+          .then((response) => {
+            setIsDeleted(true);
+          })
+          .catch((error) => {
+            console.error(
+              `Error while removing user from a ${scope} :::`,
+              error
+            );
+          });
+        break;
+      }
+      default: {
+        console.log("Default case worked...");
+        setLoadSpinner(false);
       }
     }
   };
 
   useEffect(() => {
     setLoadSpinner(true);
-    const callUserGroups = async () => {
-      await getUserGroups(
-        localStorage.getItem("auth_access_token") || "",
-        userId
-      );
-    };
+    if (!isRoles && !isUserAllGroups) {
+      const callUserGroups = async () => {
+        await getUserGroups(
+          localStorage.getItem("auth_access_token") || "",
+          userId
+        );
+      };
 
-    callUserGroups();
-    console.log("User groups :", userGroups);
+      callUserGroups();
+    }
+    if (!isRoles && isUserAllGroups) {
+      getUserAllGroups(localStorage.getItem("auth_access_token") || "", userId);
+    }
+
+    if (isRoles) {
+      if (!isUserAllRoles) {
+        fetchUserRoles();
+      }
+      if (isUserAllRoles) {
+        getUserAllRoles(
+          localStorage.getItem("auth_access_token") || "",
+          userId
+        );
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdded, isDeleted]);
 
   return (
@@ -86,7 +245,8 @@ const NavTabTable = ({
               </tr>
             </thead>
             <tbody>
-              {userGroups &&
+              {!isRoles &&
+                userGroups &&
                 userGroups?.map((group, index) => {
                   return (
                     <tr key={group._id} title={group.name}>
@@ -94,11 +254,86 @@ const NavTabTable = ({
                       <td key={index} id={group._id}>
                         {group.description}
                       </td>
-                      {showEditButton && (
+                      {showDeleteButton && (
                         <td>
                           <button
                             className="btn btn-danger"
                             onClick={(e) => remove(group._id, scope)}
+                          >
+                            <FaTimes />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              {!isRoles &&
+                userAllGroups &&
+                userAllGroups?.map((group) => {
+                  return (
+                    <tr key={group._id} title={group.name}>
+                      <td id={group._id}>{group.name}</td>
+                      <td id={group._id} title={group.description}>
+                        {group.description}
+                      </td>
+                      {showDeleteButton && (
+                        <td>
+                          <button
+                            className="btn btn-danger"
+                            onClick={(e) => remove(group._id, scope)}
+                          >
+                            <FaTimes />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              {isRoles &&
+                userRoles &&
+                userRoles?.map((role) => {
+                  return (
+                    <tr key={role._id} title={role.name}>
+                      <td title={role.name}>{role.name}</td>
+                      <td title={role.applicatioName}>
+                        {role.applicationName}
+                      </td>
+                      <td title={role.description}>{role.description}</td>
+                      {showDeleteButton && (
+                        <td>
+                          <button
+                            className="btn btn-danger"
+                            onClick={(e) => remove(role._id, scope)}
+                          >
+                            <FaTimes />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              {isRoles &&
+                userAllRoles &&
+                userAllRoles.map((role) => {
+                  return (
+                    <tr key={role._id} title={role.name}>
+                      <td title={role.name} id={role._id}>
+                        {role.name}
+                      </td>
+                      <td
+                        title={role.applicationName}
+                        id={role.applicationName}
+                      >
+                        {role.applicationName}
+                      </td>
+                      <td id={role._id} title={role.description}>
+                        {role.description}
+                      </td>
+                      {showDeleteButton && (
+                        <td>
+                          <button
+                            className="btn btn-danger"
+                            onClick={(e) => remove(role._id, scope)}
                           >
                             <FaTimes />
                           </button>

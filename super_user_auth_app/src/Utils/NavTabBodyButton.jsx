@@ -1,25 +1,30 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router";
 import AppModal from "./AppModal";
-import ModalDialog from "../Components/UserDetails";
 
-const NavTabBodyButton = ({ showButton, buttonLabel, isAdded, setIsAdded }) => {
-  const userName = localStorage.getItem("user_profile")
-    ? JSON.parse(localStorage.getItem("user_profile")).name
-    : "";
+const NavTabBodyButton = ({
+  showButton,
+  buttonLabel,
+  isAdded,
+  setIsAdded,
+  isRoles,
+  scopes,
+  dialogBoxHeader,
+  isDeleted,
+}) => {
   return (
     showButton && (
       <div>
         <AppModal
           buttonLabel={buttonLabel}
           showButton={true}
-          dialogBoxHeader={`Add ${userName} to one or more groups`}
+          dialogBoxHeader={dialogBoxHeader}
           tableRow={["Name", "Description"]}
-          scopes={"Groups"}
+          scopes={scopes}
           isAdded={isAdded}
           setIsAdded={setIsAdded}
+          isRoles={isRoles}
+          isDeleted={isDeleted}
         />
-        {/* <ModalDialog/> */}
       </div>
     )
   );

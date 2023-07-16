@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-concat */
 import React from "react";
 import { useNavigate } from "react-router";
 
@@ -7,6 +8,10 @@ function NavTabHeader({ showTab, tabsHeaders }) {
   const handleNavigation = (header) => {
     switch (header.toLowerCase()) {
       case "groups": {
+        navigate("show");
+        break;
+      }
+      case "roles": {
         navigate("show");
         break;
       }
@@ -22,9 +27,9 @@ function NavTabHeader({ showTab, tabsHeaders }) {
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
           {tabsHeaders.map((header, index) => {
             return (
-              <li class="nav-item" role="presentation">
+              <li class="nav-item" role="presentation" key={index + 1}>
                 <button
-                  class={
+                  className={
                     `${
                       index === 0
                         ? "nav-link active btn-primary "

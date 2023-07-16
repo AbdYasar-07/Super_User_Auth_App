@@ -5,15 +5,24 @@ import Content from "./Components/Contents/Content";
 import ContentOutlet from "./Components/Contents/ContentOutlet";
 import { CodeSnippet } from "./Utils/CodeSnippet";
 import NestedContentOutlet from "./Components/Contents/NestedContentOutlet";
-import UserGroups from "./Components/Users/UserGroups";
-import Groups, {
-  AllGroupTable,
-  AllGroupsContent,
-} from "./Components/Users/Groups";
 import Roles from "./Components/Users/Roles";
-import ModalDialog from "./Components/UserDetails";
 import GroupsOutlet from "./Components/Contents/GroupsOutlet";
+import Groups from "./Components/Users/Groups";
+import AllGroups from "./Components/Users/AllGroups";
+import { useEffect, useState } from "react";
+import RolesOutlet from "./Components/Contents/RolesOutlet";
+import AllRoles from "./Components/Users/AllRoles";
+
 function App() {
+  const [isProfileRendered, setIsProfileRendered] = useState(false);
+  const [loggedUserProfile, setLoggedUserProfile] = useState([]);
+  useEffect(() => {
+    setLoggedUserProfile(
+      JSON.stringify(JSON.parse(localStorage.getItem("user_profile")), null, 2)
+    );
+    setIsProfileRendered(false);
+  }, [isProfileRendered]);
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -21,26 +30,32 @@ function App() {
           <Route path="/" element={<AppLayout />}>
             <Route path="users" element={<Content />}>
               <Route index element={<ContentOutlet />}></Route>
-              <Route path=":userId" element={<NestedContentOutlet />}>
+              <Route
+                path=":userId"
+                element={
+                  <NestedContentOutlet
+                    setIsProfileRendered={setIsProfileRendered}
+                    isProfileRendered={isProfileRendered}
+                  />
+                }
+              >
                 <Route
-                  index
                   path="profile"
                   element={
                     <CodeSnippet
                       title="User Profile"
-                      code={JSON.stringify(
-                        JSON.parse(localStorage.getItem("user_profile")),
-                        null,
-                        2
-                      )}
+                      code={loggedUserProfile}
                     />
                   }
                 ></Route>
                 <Route path="groups" element={<GroupsOutlet />}>
                   <Route path="show" element={<Groups />}></Route>
-                  <Route path="allgroups" element={"All Groups"}></Route>
+                  <Route path="allgroups" element={<AllGroups />}></Route>
                 </Route>
-                <Route path="roles" element={<Roles />}></Route>
+                <Route path="roles" element={<RolesOutlet />}>
+                  <Route path="show" element={<Roles />}></Route>
+                  <Route path="allroles" element={<AllRoles />}></Route>
+                </Route>
               </Route>
             </Route>
           </Route>
