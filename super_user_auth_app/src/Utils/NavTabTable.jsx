@@ -3,6 +3,7 @@ import Axios from "./Axios";
 import { useParams } from "react-router";
 import AppSpinner from "./AppSpinner";
 import { FaTimes } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 const NavTabTable = ({
   showTable,
@@ -24,6 +25,9 @@ const NavTabTable = ({
   const [userAllGroups, setUserAllGroups] = useState([]);
   const [userRoles, setUserRoles] = useState([]);
   const [userAllRoles, setUserAllRoles] = useState([]);
+
+  const loaction = useLocation();
+  const [tableValue, setTableValue] = useState(false);
 
   const getUserGroups = async (accessToken, userId) => {
     await Axios(resource + `/users/${userId}/groups`, "GET", null, accessToken)
@@ -146,7 +150,7 @@ const NavTabTable = ({
     }
 
     if (isUserAllRoles) {
-      setUserAllRoles(roles);
+      setUserAllRoles(roles); 
     }
   };
 
@@ -224,9 +228,27 @@ const NavTabTable = ({
         );
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdded, isDeleted]);
 
+  useEffect(() => {
+    if (loaction.pathname.endsWith("allroles")) {
+      scope = "All-Roles";
+    }
+    switch (scope) {
+      case "Group":
+        userGroups.length == 0 ? setTableValue(true) : setTableValue(false);
+        break;
+      case "All-Groups":
+        userAllGroups.length == 0 ? setTableValue(true) : setTableValue(false);
+        break;
+      case "Roles":
+        userRoles.length == 0 ? setTableValue(true) : setTableValue(false);
+        break;
+      case "All-Roles":
+        userAllRoles.length == 0 ? setTableValue(true) : setTableValue(false);
+        break;
+    }
+  }, [userGroups, userAllGroups, userRoles, userAllRoles]);
   return (
     <>
       {loadSpinner && <AppSpinner />}
@@ -346,6 +368,7 @@ const NavTabTable = ({
           </table>
         </div>
       )}
+      {!loadSpinner && tableValue && <p className="text-center fw-bold fs-6">No {scope.toLowerCase()} were found</p>}
     </>
   );
 };

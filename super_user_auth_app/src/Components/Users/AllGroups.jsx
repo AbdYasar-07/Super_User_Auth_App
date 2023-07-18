@@ -15,6 +15,7 @@ const AllGroups = () => {
           showTable={true}
           showDeleteButton={false}
           isUserAllGroups={true}
+          scope={"All-Groups"}
         />
       </div>
     </div>

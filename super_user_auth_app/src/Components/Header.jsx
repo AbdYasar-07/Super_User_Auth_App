@@ -24,6 +24,14 @@ const Header = ({ user }) => {
               height="100"
             />
           </a>
+          <a class="navbar-brand ms-4">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSSetZHth0LHil6EGxW5ngEMCLEzKEyWrlaA&usqp=CAU"
+              alt="Conception"
+              width="120"
+              height="100"
+            />
+          </a>
           {/* <button
             class="navbar-toggler"
             type="button"
